@@ -1,4 +1,3 @@
-// src/components/Login.js
 "use client";
 import React, { useState } from "react";
 import {
@@ -9,21 +8,50 @@ import {
   CircularProgress,
   Container,
   Paper,
+  IconButton,
+  InputAdornment,
+  createTheme,
+  ThemeProvider,
 } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { useLoginMutation } from "@/lib/service/api";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
+
+const theme = createTheme({
+  palette: {
+    primary: {
+      main: "#14B890",
+    },
+    background: {
+      default: "#f5f5f5",
+      paper: "#ffffff",
+    },
+    text: {
+      primary: "#333333",
+      secondary: "#666666",
+    },
+  },
+});
 
 export default function Login() {
-  const [phone, setPhone] = useState("+998333932580");
-  const [password, setPassword] = useState("admin");
+  const [showPassword, setShowPassword] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [login, { isLoading, error }] = useLoginMutation();
   const router = useRouter();
+
+  const handleClickShowPassword = () => setShowPassword((show) => !show);
+  const handleMouseDownPassword = (event) => {
+    event.preventDefault();
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
-      const response = await login({ phone, password }).unwrap();
+      console.log(email, password);
+
+      const response = await login({ email, password }).unwrap();
       localStorage.setItem("authToken", JSON.stringify(response));
       router.push("/");
     } catch (err) {
@@ -32,74 +60,118 @@ export default function Login() {
   };
 
   return (
-    <Container
-      maxWidth="sm"
-      sx={{
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        height: "100%",
-      }}
-    >
-      <Paper
-        elevation={3}
+    <ThemeProvider theme={theme}>
+      <Container
+        maxWidth="sm"
         sx={{
-          padding: 4,
-          borderRadius: 3,
-          width: "100%",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "800px",
+          padding: 2,
         }}
       >
-        <Box
-          component="form"
-          onSubmit={handleSubmit}
+        <Paper
+          elevation={3}
           sx={{
-            display: "flex",
-            flexDirection: "column",
-            gap: 2,
+            padding: 4,
+            borderRadius: 3,
+            width: "100%",
+            maxWidth: 480,
+            margin: "0 auto",
+            bgcolor: "background.paper",
           }}
         >
-          <Typography variant="h4" align="center" gutterBottom>
-            Login
-          </Typography>
-          {error && (
-            <Typography color="error" variant="body2" align="center">
-              {error?.data?.message || "Login failed"}
-            </Typography>
-          )}
-          <TextField
-            label="Phone Number"
-            variant="outlined"
-            fullWidth
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-            required
-          />
-          <TextField
-            label="Password"
-            type="password"
-            variant="outlined"
-            fullWidth
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-          <Button
-            type="submit"
-            variant="contained"
-            color="primary"
-            fullWidth
-            disabled={isLoading}
+          <Box
+            component="form"
+            onSubmit={handleSubmit}
             sx={{
-              height: 48,
-              fontWeight: "bold",
-              textTransform: "none",
+              display: "flex",
+              flexDirection: "column",
+              gap: 3,
             }}
-            startIcon={isLoading && <CircularProgress size={20} />}
           >
-            {isLoading ? "Loading..." : "Login"}
-          </Button>
-        </Box>
-      </Paper>
-    </Container>
+            <Typography
+              className="font-bold"
+              variant="h4"
+              gutterBottom
+              sx={{ color: "text.primary" }}
+            >
+              Kirish
+            </Typography>
+            <br />
+            {error && (
+              <Typography color="error" variant="body2" align="center">
+                {error?.data?.message || "Login failed"}
+              </Typography>
+            )}
+            <TextField
+              className="rounded-lg"
+              id="outlined-basic"
+              label="Email Address"
+              variant="outlined"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              fullWidth
+            />
+            <TextField
+              className="rounded-lg"
+              id="outlined-password"
+              label="Password"
+              variant="outlined"
+              type={showPassword ? "text" : "password"}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              fullWidth
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      aria-label={
+                        showPassword ? "hide password" : "show password"
+                      }
+                      onClick={handleClickShowPassword}
+                      onMouseDown={handleMouseDownPassword}
+                      edge="end"
+                    >
+                      {showPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
+            />
+            <Button
+              type="submit"
+              variant="contained"
+              className="w-28 rounded-lg"
+              disabled={isLoading}
+              sx={{
+                height: 48,
+                fontWeight: "bold",
+                textTransform: "none",
+                mt: 2,
+                bgcolor: "primary.main",
+                "&:hover": {
+                  bgcolor: "primary.dark",
+                },
+              }}
+            >
+              {isLoading ? (
+                <CircularProgress
+                  size={20}
+                  sx={{ marginRight: 1, color: "#fff" }}
+                />
+              ) : (
+                "войти"
+              )}
+              {isLoading ? "Loading..." : ""}
+            </Button>
+          </Box>
+        </Paper>
+      </Container>
+    </ThemeProvider>
   );
 }

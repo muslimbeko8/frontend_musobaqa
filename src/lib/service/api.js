@@ -3,7 +3,7 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 const api = createApi({
   reducerPath: "api",
   baseQuery: fetchBaseQuery({
-    baseUrl: "https://doctorhelper.pythonanywhere.com/api/v1",
+    baseUrl: "http://localhost:3000",
     prepareHeaders: (headers) => {
       const token = localStorage.getItem("authToken");
       let parsedToken;
@@ -22,27 +22,13 @@ const api = createApi({
   }),
   endpoints: (builder) => ({
     login: builder.mutation({
-      query: ({ phone, password }) => ({
-        url: "/login/",
+      query: ({ email, password }) => ({
+        url: "/login",
         method: "POST",
-        body: { phone, password },
+        body: { email, password },
         headers: {
           "Content-Type": "application/json",
         },
-      }),
-    }),
-    tokenVerify: builder.mutation({
-      query: (token) => ({
-        url: "/verify/",
-        method: "POST",
-        body: { token },
-      }),
-    }),
-    refreshToken: builder.mutation({
-      query: (refresh) => ({
-        url: "/refresh/",
-        method: "POST",
-        body: { refresh },
       }),
     }),
 
@@ -51,15 +37,6 @@ const api = createApi({
     }),
     getServiceId: builder.query({
       query: (id) => `/service/${id}`,
-    }),
-    geDoctors: builder.query({
-      query: () => "/doctor/",
-    }),
-    getDoctorId: builder.query({
-      query: (id) => `/doctor/${id}`,
-    }),
-    getServiceTypes: builder.query({
-      query: () => `/service-types/`,
     }),
 
     createService: builder.mutation({
@@ -79,15 +56,5 @@ const api = createApi({
   }),
 });
 
-export const {
-  useGetServicesQuery,
-  useGetServiceIdQuery,
-  useGeDoctorsQuery,
-  useGetDoctorIdQuery,
-  useTokenVerifyMutation,
-  useRefreshTokenMutation,
-  useLoginMutation,
-  useCreateServiceMutation,
-  useGetServiceTypesQuery,
-} = api;
+export const { useLoginMutation } = api;
 export default api;
