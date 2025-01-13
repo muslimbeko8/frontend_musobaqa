@@ -3,30 +3,29 @@
 import React from "react";
 import { usePathname } from "next/navigation";
 import "./globals.css";
-import Appbar from "@/components/Navbar";
+import Navbar from "@/components/Appbar";
 import StoreProvider from "./storeProvider";
 
 export default function RootLayout({ children }) {
   const pathname = usePathname();
+  const isLoginPage = pathname === "/login";
 
   return (
     <html lang="en">
-      <StoreProvider>
-        <body>
-          <div style={{ display: "flex", height: "100vh" }}>
-            {pathname !== "/login" && <Appbar />}
+      <body>
+        <StoreProvider>
+          <div className="min-h-screen bg-gray-50">
+            {!isLoginPage && <Navbar />}
             <main
-              style={{
-                flexGrow: 1,
-                paddingTop: "55px",
-                marginLeft: pathname !== "/login" ? "80px" : "0",
-              }}
+              className={`${
+                !isLoginPage ? "lg:ml-64 pt-14" : ""
+              } min-h-screen transition-all duration-300 p-4`}
             >
               {children}
             </main>
           </div>
-        </body>
-      </StoreProvider>
+        </StoreProvider>
+      </body>
     </html>
   );
 }
