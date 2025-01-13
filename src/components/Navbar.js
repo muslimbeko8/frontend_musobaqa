@@ -1,105 +1,99 @@
-import React, { useState } from "react";
-import { useRouter } from "next/navigation";
-import GroupIcon from "@mui/icons-material/Group";
-import CheckBoxIcon from "@mui/icons-material/CheckBox";
-import PieChartIcon from "@mui/icons-material/PieChart";
-import BusinessCenterIcon from "@mui/icons-material/BusinessCenter";
-import StorageIcon from "@mui/icons-material/Storage";
+import React from "react";
+import { usePathname, useRouter } from "next/navigation";
+import {
+  Group,
+  CheckSquare,
+  PieChart,
+  Briefcase,
+  Database,
+} from "lucide-react";
 
-const Appbar = () => {
-  const [activePath, setActivePath] = useState("/"); // Faol bo'limni kuzatish uchun state
+const Navbar = () => {
+  const pathname = usePathname();
   const router = useRouter();
 
   const navItems = [
     {
       title: "Umumiy",
       path: "/",
-      icon: <StorageIcon />,
+      icon: <Database className="w-5 h-5" />,
     },
     {
       title: "Block langanar",
       path: "/blocks",
-      icon: <CheckBoxIcon />,
+      icon: <CheckSquare className="w-5 h-5" />,
     },
     {
       title: "Managerlar",
       path: "/managers",
-      icon: <GroupIcon />,
+      icon: <Group className="w-5 h-5" />,
     },
     {
       title: "Hodimlar",
       path: "/employees",
-      icon: <BusinessCenterIcon />,
+      icon: <Briefcase className="w-5 h-5" />,
     },
     {
       title: "Vazifalar",
       path: "/tasks",
-      icon: <PieChartIcon />,
+      icon: <PieChart className="w-5 h-5" />,
     },
   ];
 
   const handleNavigation = (path) => {
-    setActivePath(path); // Faol bo'limni yangilash
     router.push(path);
   };
 
   return (
-    <div className="flex h-screen bg-gray-100">
-      <div className="flex">
-        <div className={`w-64 h-screen fixed left-0 top-0 bg-white shadow-lg`}>
-          <div className="p-4 border-b">
-            <div className="flex items-center gap-2">
-              <div className="w-6 h-6">
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  className="w-full h-full text-emerald-500"
-                >
-                  <path
-                    d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              </div>
-              <span className="text-emerald-500 text-xl font-semibold select-none">
-                Тайпро
-              </span>
-            </div>
-          </div>
-
-          <div className="h-full">
-            {navItems.map((item, index) => (
-              <button
-                key={index}
-                onClick={() => handleNavigation(item.path)}
-                className={`w-full text-left cursor-pointer px-4 py-3 flex items-center rounded-lg focus:outline-none transition-all 
-                  ${
-                    activePath === item.path
-                      ? "bg-gray-200 text-emerald-500 opacity-100"
-                      : "hover:bg-gray-200 hover:text-emerald-500 opacity-60"
-                  }
-                `}
+    <aside className="flex h-screen bg-gray-100">
+      <div className="w-64 h-screen fixed left-0 top-0 bg-white shadow-lg">
+        <div className="p-4 border-b">
+          <div className="flex items-center gap-2">
+            <div className="w-6 h-6">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                className="w-full h-full text-emerald-500"
+                aria-hidden="true"
               >
-                <span className={`w-6 transition-colors `}>{item.icon}</span>
-                <span
-                  className={`ml-2 ${
-                    activePath === item.path
-                      ? "text-emerald-500"
-                      : "text-gray-500"
-                  }`}
-                >
-                  {item.title}
-                </span>
-              </button>
-            ))}
+                <path
+                  d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </div>
+            <span className="text-emerald-500 text-xl font-semibold select-none">
+              Тайпро
+            </span>
           </div>
         </div>
+
+        <nav className="h-full py-2">
+          {navItems.map((item) => {
+            const isActive = pathname === item.path;
+            return (
+              <button
+                key={item.path}
+                onClick={() => handleNavigation(item.path)}
+                className={`w-full text-left px-4 py-3 flex items-center gap-2 transition-colors ${
+                  isActive
+                    ? "bg-emerald-50 text-emerald-600"
+                    : "hover:bg-gray-50 text-gray-700 hover:text-gray-900"
+                }`}
+                aria-current={isActive ? "page" : undefined}
+              >
+                <span className="flex-shrink-0">{item.icon}</span>
+                <span className="font-medium">{item.title}</span>
+              </button>
+            );
+          })}
+        </nav>
       </div>
-    </div>
+    </aside>
   );
 };
 
-export default Appbar;
+export default Navbar;
