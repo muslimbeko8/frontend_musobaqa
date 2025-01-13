@@ -9,6 +9,7 @@ import {
   Briefcase,
   Database,
   Menu,
+  ChevronDown,
 } from "lucide-react";
 
 const Navbar = () => {
@@ -52,26 +53,52 @@ const Navbar = () => {
   return (
     <>
       {/* Top AppBar */}
-      <header className="fixed top-0 left-0 right-0 bg-white shadow-sm h-14 z-20">
-        <div className="flex items-center justify-between h-full px-4">
-          <button
-            onClick={() => setMobileOpen(!mobileOpen)}
-            className="lg:hidden p-2 hover:bg-gray-100 rounded-lg"
-            aria-label="Toggle menu"
-          >
-            <Menu className="w-6 h-6" />
-          </button>
+      <header className="fixed top-0 left-0 right-0 bg-white border-b h-16 z-20">
+        <div className="flex items-center justify-between h-full px-6">
           <div className="flex items-center gap-2">
-            <span className="text-emerald-500 text-lg font-semibold">
-              Тайпро
-            </span>
+            <button
+              onClick={() => setMobileOpen(!mobileOpen)}
+              className="lg:hidden p-2 hover:bg-gray-100 rounded-lg mr-2"
+              aria-label="Toggle menu"
+            >
+              <Menu className="w-6 h-6" />
+            </button>
+            <div className="flex items-center gap-2">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                className="w-8 h-8 text-emerald-500"
+                aria-hidden="true"
+              >
+                <path
+                  d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+              <span className="text-emerald-500 text-xl font-semibold">
+                Тайпро
+              </span>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <div className="text-right">
+              <div className="text-gray-700">manager@mail.ru</div>
+              <div className="text-sm text-gray-500">
+                Администратор компании
+              </div>
+            </div>
+            <ChevronDown className="w-5 h-5 text-gray-400" />
           </div>
         </div>
       </header>
 
       {/* Sidebar */}
       <aside
-        className={`fixed top-14 left-0 h-[calc(100vh-3.5rem)] w-64 bg-white shadow-lg transition-transform lg:translate-x-0 z-10 ${
+        className={`fixed top-16 left-0 h-[calc(100vh-4rem)] w-64 bg-white shadow-lg transition-transform lg:translate-x-0 z-10 ${
           mobileOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
