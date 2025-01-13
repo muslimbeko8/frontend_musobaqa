@@ -1,53 +1,88 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   Table,
   TableBody,
-  Paper,
   TableCell,
   TableContainer,
   TableHead,
   TableRow,
   Button,
-  Pagination,
   TextField,
   Box,
-  Typography,
+  Paper,
+  TablePagination,
 } from "@mui/material";
+import { useGetEmployeesQuery, useGetManagersQuery } from "@/lib/service/api";
 
 export default function HomePage() {
-  const rows = [
-    {
-      id: 1,
-      name: "manager1",
-      email: "manager1@manager1",
-      last_name: "manager1",
-      tel_number: "+998944590628",
-      type: "manager",
-      isActive: true,
-      tasks: [
-        {
-          id: 1,
-          name: "hodim qabul qilish",
-          type: "manager",
-        },
-        {
-          id: 4,
-          name: "hodim qabul qilish",
-          type: "manager",
-        },
-      ],
-    },
-    {
-      id: 2,
-      name: "manager2",
-      email: "manager2@manager2",
-      last_name: "manager1",
-      tel_number: "+998944590628",
-      type: "manager",      
-      isActive: true,
-      tasks: [],
-    },
-  ];
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+
+  const { data: employeesData, isLoading: isEmployeesLoading } =
+    useGetEmployeesQuery({
+      limit: pageSize,
+      page: currentPage,
+    });
+
+  const { data: managersData, isLoading: isManagersLoading } =
+    useGetManagersQuery({
+      limit: pageSize,
+      page: currentPage,
+    });
+
+  const [employees, setEmployees] = useState([]);
+
+  useEffect(() => {
+    if (employeesData && managersData) {
+      setEmployees([...employeesData, ...managersData]);
+    }
+  }, [employeesData, managersData]);
+
+  const handlePageChange = (event, newPage) => {
+    setCurrentPage(newPage + 1);
+  };
+
+  const handleRowsPerPageChange = (event) => {
+    setPageSize(parseInt(event.target.value, 10));
+    setCurrentPage(1);
+  };
+
+  const renderStatus = (isActive) => {
+    if (isActive) {
+      return (
+        <Button
+          variant="outlined"
+          color="success"
+          size="small"
+          sx={{
+            textTransform: "none",
+            fontWeight: "bold",
+            borderRadius: "12px",
+          }}
+        >
+          Active
+        </Button>
+      );
+    }
+    return (
+      <Button
+        variant="outlined"
+        color="error"
+        size="small"
+        sx={{
+          textTransform: "none",
+          fontWeight: "bold",
+          borderRadius: "12px",
+        }}
+      >
+        Block
+      </Button>
+    );
+  };
+
+  if (isEmployeesLoading || isManagersLoading) {
+    return <div>Yuklanmoqda...</div>;
+  }
 
   return (
     <Box sx={{ padding: 3 }}>
@@ -60,7 +95,7 @@ export default function HomePage() {
         }}
       >
         <Button variant="contained" color="success">
-          + Hodim qo'shish
+          + Xodim qo'shish
         </Button>
         <TextField
           variant="outlined"
@@ -70,62 +105,43 @@ export default function HomePage() {
         />
       </Box>
 
-      {/* Table */}
       <TableContainer component={Paper}>
         <Table>
           <TableHead>
-            <TableRow>
-              <TableCell>Фамилия Имя</TableCell>
-              <TableCell>Turi</TableCell>
-              <TableCell>Телефон</TableCell>
-              <TableCell>E-mail</TableCell>
-              <TableCell>Статус проверяющего</TableCell>
-              <TableCell align="right">Amallar</TableCell>
+            <TableRow sx={{ backgroundColor: "#f5f5f5" }}>
+              <TableCell sx={{ fontWeight: "bold" }}>Фамилия Имя</TableCell>
+              <TableCell sx={{ fontWeight: "bold" }}>Turi</TableCell>
+              <TableCell sx={{ fontWeight: "bold" }}>Телефон</TableCell>
+              <TableCell sx={{ fontWeight: "bold" }}>E-mail</TableCell>
+              <TableCell sx={{ fontWeight: "bold" }}>
+                Статус проверяющего
+              </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {rows.map((row, index) => (
+            {employees.map((employee, index) => (
               <TableRow key={index}>
                 <TableCell>
-                  {row.name} {row.last_name}
+                  {employee.name} {employee.last_name}
                 </TableCell>
-                <TableCell>{row.type}</TableCell>
-                <TableCell>{row.tel_number}</TableCell>
-                <TableCell>{row.email}</TableCell>
-                <TableCell>
-                  {row.isActive ? <h1>blok</h1> : <h1>Active</h1>}
-                </TableCell>
-
-                <TableCell align="right">
-                  <Button
-                    variant="contained"
-                    color="success"
-                    size="small"
-                    sx={{ mr: 1 }}
-                  >
-                    O'zgartirish
-                  </Button>
-                  <Button variant="contained" color="error" size="small">
-                    O'chirish
-                  </Button>
-                </TableCell>
+                <TableCell>{employee.type}</TableCell>
+                <TableCell>{employee.tel_number}</TableCell>
+                <TableCell>{employee.email}</TableCell>
+                <TableCell>{renderStatus(employee.isActive)}</TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
       </TableContainer>
 
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          mt: 2,
-        }}
-      >
-        <Typography variant="body2">1–10 из 28</Typography>
-        <Pagination count={3} color="primary" />
-      </Box>
+      <TablePagination
+        component="div"
+        count={100}
+        page={currentPage - 1}
+        onPageChange={handlePageChange}
+        rowsPerPage={pageSize}
+        onRowsPerPageChange={handleRowsPerPageChange}
+      />
     </Box>
   );
 }

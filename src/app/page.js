@@ -1,4 +1,5 @@
 "use client";
+import HomePage from "@/components/home";
 import { useAuth } from "@/hooks/auth";
 import StorefrontIcon from "@mui/icons-material/Storefront";
 export default function Home() {
@@ -6,7 +7,7 @@ export default function Home() {
 
   return (
     <>
-      <div className="flex mt-[350px] flex-col items-center justify-center h-full">
+      {/* <div className="flex mt-[350px] flex-col items-center justify-center h-full">
         <StorefrontIcon
           style={{
             fontSize: "100px",
@@ -14,7 +15,8 @@ export default function Home() {
           }}
         />
         <p className="text-gray-500 mt-4 text-lg">Ma'lumot yo'q</p>
-      </div>
+      </div> */}
+      <HomePage />
     </>
   );
 }

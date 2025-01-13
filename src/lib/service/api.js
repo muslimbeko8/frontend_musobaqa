@@ -13,13 +13,14 @@ const api = createApi({
         console.error("Invalid token in localStorage:", e);
       }
 
-      if (parsedToken?.access) {
-        headers.set("Authorization", `Bearer ${parsedToken.access}`);
+      if (parsedToken?.accessToken) {
+        headers.set("Authorization", `Bearer ${parsedToken.accessToken}`);
       }
       return headers;
     },
   }),
   endpoints: (builder) => ({
+    // Login endpoint
     login: builder.mutation({
       query: ({ email, password }) => ({
         url: "/login",
@@ -28,22 +29,27 @@ const api = createApi({
       }),
     }),
 
+    // Get all managers
     getManagers: builder.query({
-      query: () => "/managers",
+      query: ({ limit, page }) => `/managers?_limit=${limit}&_page=${page}`,
     }),
 
+    // Get all employees
     getEmployees: builder.query({
-      query: () => "/employees",
+      query: ({ limit, page }) => `/employees?_limit=${limit}&_page=${page}`,
     }),
 
+    // Get all tasks
     getTasks: builder.query({
-      query: () => "/tasks",
+      query: ({ limit, page }) => `/tasks?_limit=${limit}&_page=${page}`,
     }),
 
+    // Get specific tasks by type
     getSpecificTask: builder.query({
       query: (type) => `/tasks?type=${type}`,
     }),
 
+    // Create or update a service for a manager
     createService: builder.mutation({
       query: ({ task, id }) => ({
         url: `/managers/${id}`,
@@ -52,18 +58,17 @@ const api = createApi({
       }),
     }),
 
+    // Get a single manager by ID
     getSingleManager: builder.query({
       query: (id) => `/managers/${id}`,
     }),
 
+    // Search manager by name
     searchManager: builder.query({
       query: (name) => `/managers?name=${name}`,
     }),
 
-    paginationManager: builder.query({
-      query: ({ limit, page }) => `/managers?_limit=${limit}&_page=${page}`,
-    }),
-
+    // Delete a manager
     deleteManager: builder.mutation({
       query: (id) => ({
         url: `/managers/${id}`,
@@ -71,6 +76,7 @@ const api = createApi({
       }),
     }),
 
+    // Edit manager details
     editManager: builder.mutation({
       query: ({ body, id }) => ({
         url: `/managers/${id}`,
@@ -90,7 +96,6 @@ export const {
   useCreateServiceMutation,
   useGetSingleManagerQuery,
   useSearchManagerQuery,
-  usePaginationManagerQuery,
   useDeleteManagerMutation,
   useEditManagerMutation,
 } = api;
