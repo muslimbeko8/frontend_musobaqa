@@ -14,7 +14,7 @@ import {
   Typography,
 } from "@mui/material";
 
-export default function EmployeeTable() {
+export default function HomePage() {
   const rows = [
     {
       id: 1,
@@ -43,7 +43,7 @@ export default function EmployeeTable() {
       email: "manager2@manager2",
       last_name: "manager1",
       tel_number: "+998944590628",
-      type: "manager",
+      type: "manager",      
       isActive: true,
       tasks: [],
     },
@@ -51,7 +51,6 @@ export default function EmployeeTable() {
 
   return (
     <Box sx={{ padding: 3 }}>
-      {/* Top bar */}
       <Box
         sx={{
           display: "flex",

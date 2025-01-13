@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import React, { useState } from "react";
 import {
   Table,
@@ -46,7 +46,6 @@ export default function EmployeeTable() {
     email: "",
   });
 
-  // Modalni boshqarish
   const handleOpenAddModal = () => setOpenAddModal(true);
   const handleCloseAddModal = () => setOpenAddModal(false);
 
@@ -72,7 +71,6 @@ export default function EmployeeTable() {
     setOpenDeleteModal(false);
   };
 
-  // Yangi xodim qo'shish
   const handleAddEmployee = () => {
     if (
       newEmployee.name &&
@@ -86,7 +84,6 @@ export default function EmployeeTable() {
     }
   };
 
-  // Xodimni o'zgartirish
   const handleEditEmployee = () => {
     const updatedEmployees = [...employees];
     updatedEmployees[selectedIndex] = newEmployee;
@@ -94,7 +91,6 @@ export default function EmployeeTable() {
     handleCloseEditModal();
   };
 
-  // Xodimni o'chirish
   const handleDeleteEmployee = () => {
     const updatedEmployees = employees.filter((_, i) => i !== selectedIndex);
     setEmployees(updatedEmployees);
@@ -103,7 +99,6 @@ export default function EmployeeTable() {
 
   return (
     <Box sx={{ padding: 3 }}>
-      {/* Top bar */}
       <Box
         sx={{
           display: "flex",
@@ -112,7 +107,11 @@ export default function EmployeeTable() {
           mb: 2,
         }}
       >
-        <Button variant="contained" color="success" onClick={handleOpenAddModal}>
+        <Button
+          variant="contained"
+          color="success"
+          onClick={handleOpenAddModal}
+        >
           + Xodim qo'shish
         </Button>
         <TextField
@@ -132,9 +131,6 @@ export default function EmployeeTable() {
               <TableCell sx={{ fontWeight: "bold" }}>Hodim turi</TableCell>
               <TableCell sx={{ fontWeight: "bold" }}>Telefon</TableCell>
               <TableCell sx={{ fontWeight: "bold" }}>E-mail</TableCell>
-              <TableCell align="right" sx={{ fontWeight: "bold" }}>
-                Amallar
-              </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -169,7 +165,6 @@ export default function EmployeeTable() {
         </Table>
       </TableContainer>
 
-      {/* Add Employee Modal */}
       <Modal open={openAddModal} onClose={handleCloseAddModal}>
         <Box
           sx={{
@@ -234,14 +229,17 @@ export default function EmployeeTable() {
             >
               Qo'shish
             </Button>
-            <Button variant="outlined" color="error" onClick={handleCloseAddModal}>
+            <Button
+              variant="outlined"
+              color="error"
+              onClick={handleCloseAddModal}
+            >
               Bekor qilish
             </Button>
           </Box>
         </Box>
       </Modal>
 
-      {/* Edit Employee Modal */}
       <Modal open={openEditModal} onClose={handleCloseEditModal}>
         <Box
           sx={{
@@ -306,14 +304,17 @@ export default function EmployeeTable() {
             >
               Saqlash
             </Button>
-            <Button variant="outlined" color="error" onClick={handleCloseEditModal}>
+            <Button
+              variant="outlined"
+              color="error"
+              onClick={handleCloseEditModal}
+            >
               Bekor qilish
             </Button>
           </Box>
         </Box>
       </Modal>
 
-      {/* Delete Employee Modal */}
       <Modal open={openDeleteModal} onClose={handleCloseDeleteModal}>
         <Box
           sx={{
@@ -333,10 +334,18 @@ export default function EmployeeTable() {
             O'chirasizmi?
           </Typography>
           <Box sx={{ display: "flex", justifyContent: "space-around", mt: 2 }}>
-            <Button variant="contained" color="error" onClick={handleDeleteEmployee}>
+            <Button
+              variant="contained"
+              color="error"
+              onClick={handleDeleteEmployee}
+            >
               Ha
             </Button>
-            <Button variant="outlined" color="primary" onClick={handleCloseDeleteModal}>
+            <Button
+              variant="outlined"
+              color="primary"
+              onClick={handleCloseDeleteModal}
+            >
               Yo'q
             </Button>
           </Box>

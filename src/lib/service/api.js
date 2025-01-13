@@ -7,7 +7,6 @@ const api = createApi({
     prepareHeaders: (headers) => {
       const token = localStorage.getItem("authToken");
       let parsedToken;
-
       try {
         parsedToken = JSON.parse(token);
       } catch (e) {
@@ -26,35 +25,74 @@ const api = createApi({
         url: "/login",
         method: "POST",
         body: { email, password },
-        headers: {
-          "Content-Type": "application/json",
-        },
       }),
     }),
 
-    getServices: builder.query({
-      query: () => "/service/",
+    getManagers: builder.query({
+      query: () => "/managers",
     }),
-    getServiceId: builder.query({
-      query: (id) => `/service/${id}`,
+
+    getEmployees: builder.query({
+      query: () => "/employees",
+    }),
+
+    getTasks: builder.query({
+      query: () => "/tasks",
+    }),
+
+    getSpecificTask: builder.query({
+      query: (type) => `/tasks?type=${type}`,
     }),
 
     createService: builder.mutation({
-      query: (type) => ({
-        url: "/service/",
-        method: "POST",
-        body: type,
+      query: ({ task, id }) => ({
+        url: `/managers/${id}`,
+        method: "PATCH",
+        body: task,
       }),
     }),
-    createServ: builder.mutation({
-      query: (type) => ({
-        url: "/service/",
-        method: "POST",
-        body: type,
+
+    getSingleManager: builder.query({
+      query: (id) => `/managers/${id}`,
+    }),
+
+    searchManager: builder.query({
+      query: (name) => `/managers?name=${name}`,
+    }),
+
+    paginationManager: builder.query({
+      query: ({ limit, page }) => `/managers?_limit=${limit}&_page=${page}`,
+    }),
+
+    deleteManager: builder.mutation({
+      query: (id) => ({
+        url: `/managers/${id}`,
+        method: "DELETE",
+      }),
+    }),
+
+    editManager: builder.mutation({
+      query: ({ body, id }) => ({
+        url: `/managers/${id}`,
+        method: "PATCH",
+        body: body,
       }),
     }),
   }),
 });
 
-export const { useLoginMutation } = api;
+export const {
+  useLoginMutation,
+  useGetManagersQuery,
+  useGetEmployeesQuery,
+  useGetTasksQuery,
+  useGetSpecificTaskQuery,
+  useCreateServiceMutation,
+  useGetSingleManagerQuery,
+  useSearchManagerQuery,
+  usePaginationManagerQuery,
+  useDeleteManagerMutation,
+  useEditManagerMutation,
+} = api;
+
 export default api;
