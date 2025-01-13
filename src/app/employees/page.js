@@ -3,25 +3,24 @@ import React, { useState } from "react";
 import {
   Table,
   TableBody,
-  Paper,
   TableCell,
   TableContainer,
   TableHead,
   TableRow,
   Button,
-  Pagination,
   TextField,
   Box,
-  Typography,
+  Paper,
   Modal,
-  Select,
+  Typography,
   MenuItem,
-  InputLabel,
+  Select,
   FormControl,
+  InputLabel,
 } from "@mui/material";
 
 export default function EmployeeTable() {
-  const [rows, setRows] = useState([
+  const [employees, setEmployees] = useState([
     {
       name: "Петренко Владимир",
       role: "Manager",
@@ -40,29 +39,26 @@ export default function EmployeeTable() {
   const [openEditModal, setOpenEditModal] = useState(false);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(null);
-  const [employeeData, setEmployeeData] = useState({
+  const [newEmployee, setNewEmployee] = useState({
     name: "",
     role: "",
     phone: "",
     email: "",
   });
 
-  // Modalni ochish va yopish funksiyalari
+  // Modalni boshqarish
   const handleOpenAddModal = () => setOpenAddModal(true);
-  const handleCloseAddModal = () => {
-    setEmployeeData({ name: "", role: "", phone: "", email: "" });
-    setOpenAddModal(false);
-  };
+  const handleCloseAddModal = () => setOpenAddModal(false);
 
   const handleOpenEditModal = (index) => {
     setSelectedIndex(index);
-    setEmployeeData(rows[index]);
+    setNewEmployee(employees[index]);
     setOpenEditModal(true);
   };
 
   const handleCloseEditModal = () => {
     setSelectedIndex(null);
-    setEmployeeData({ name: "", role: "", phone: "", email: "" });
+    setNewEmployee({ name: "", role: "", phone: "", email: "" });
     setOpenEditModal(false);
   };
 
@@ -71,28 +67,38 @@ export default function EmployeeTable() {
     setOpenDeleteModal(true);
   };
 
-  const handleCloseDeleteModal = () => setOpenDeleteModal(false);
+  const handleCloseDeleteModal = () => {
+    setSelectedIndex(null);
+    setOpenDeleteModal(false);
+  };
 
-  // Xodim qo'shish
+  // Yangi xodim qo'shish
   const handleAddEmployee = () => {
-    if (employeeData.name && employeeData.role && employeeData.phone && employeeData.email) {
-      setRows([...rows, employeeData]);
+    if (
+      newEmployee.name &&
+      newEmployee.role &&
+      newEmployee.phone &&
+      newEmployee.email
+    ) {
+      setEmployees([...employees, newEmployee]);
+      setNewEmployee({ name: "", role: "", phone: "", email: "" });
       handleCloseAddModal();
     }
   };
 
   // Xodimni o'zgartirish
   const handleEditEmployee = () => {
-    const updatedRows = [...rows];
-    updatedRows[selectedIndex] = employeeData;
-    setRows(updatedRows);
+    const updatedEmployees = [...employees];
+    updatedEmployees[selectedIndex] = newEmployee;
+    setEmployees(updatedEmployees);
     handleCloseEditModal();
   };
 
   // Xodimni o'chirish
   const handleDeleteEmployee = () => {
-    setRows(rows.filter((_, index) => index !== selectedIndex));
-    setOpenDeleteModal(false);
+    const updatedEmployees = employees.filter((_, i) => i !== selectedIndex);
+    setEmployees(updatedEmployees);
+    handleCloseDeleteModal();
   };
 
   return (
@@ -107,7 +113,7 @@ export default function EmployeeTable() {
         }}
       >
         <Button variant="contained" color="success" onClick={handleOpenAddModal}>
-          + Hodim qo'shish
+          + Xodim qo'shish
         </Button>
         <TextField
           variant="outlined"
@@ -121,23 +127,23 @@ export default function EmployeeTable() {
       <TableContainer component={Paper}>
         <Table>
           <TableHead>
-            <TableRow>
-              <TableCell sx={{ fontWeight: "bold" }}>Фамилия Имя</TableCell>
-              <TableCell sx={{ fontWeight: "bold" }}>Turi</TableCell>
-              <TableCell sx={{ fontWeight: "bold" }}>Телефон</TableCell>
+            <TableRow sx={{ backgroundColor: "#f5f5f5" }}>
+              <TableCell sx={{ fontWeight: "bold" }}>F.I.O</TableCell>
+              <TableCell sx={{ fontWeight: "bold" }}>Hodim turi</TableCell>
+              <TableCell sx={{ fontWeight: "bold" }}>Telefon</TableCell>
               <TableCell sx={{ fontWeight: "bold" }}>E-mail</TableCell>
-              <TableCell sx={{ fontWeight: "bold" }} align="right">
+              <TableCell align="right" sx={{ fontWeight: "bold" }}>
                 Amallar
               </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {rows.map((row, index) => (
+            {employees.map((employee, index) => (
               <TableRow key={index}>
-                <TableCell>{row.name}</TableCell>
-                <TableCell>{row.role}</TableCell>
-                <TableCell>{row.phone}</TableCell>
-                <TableCell>{row.email}</TableCell>
+                <TableCell>{employee.name}</TableCell>
+                <TableCell>{employee.role}</TableCell>
+                <TableCell>{employee.phone}</TableCell>
+                <TableCell>{employee.email}</TableCell>
                 <TableCell align="right">
                   <Button
                     variant="contained"
@@ -163,19 +169,6 @@ export default function EmployeeTable() {
         </Table>
       </TableContainer>
 
-      {/* Pagination */}
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          mt: 2,
-        }}
-      >
-        <Typography variant="body2">1–10 из {rows.length}</Typography>
-        <Pagination count={Math.ceil(rows.length / 10)} color="primary" />
-      </Box>
-
       {/* Add Employee Modal */}
       <Modal open={openAddModal} onClose={handleCloseAddModal}>
         <Box
@@ -191,24 +184,24 @@ export default function EmployeeTable() {
             borderRadius: 2,
           }}
         >
-          <Typography variant="h6" sx={{ mb: 2 }}>
-            Hodim qo'shish
+          <Typography variant="h6" component="h2" sx={{ mb: 2 }}>
+            Xodim qo'shish
           </Typography>
           <TextField
-            fullWidth
             label="F.I.O"
-            sx={{ mb: 2 }}
-            value={employeeData.name}
+            fullWidth
+            value={newEmployee.name}
             onChange={(e) =>
-              setEmployeeData({ ...employeeData, name: e.target.value })
+              setNewEmployee({ ...newEmployee, name: e.target.value })
             }
+            sx={{ mb: 2 }}
           />
           <FormControl fullWidth sx={{ mb: 2 }}>
             <InputLabel>Hodim turi</InputLabel>
             <Select
-              value={employeeData.role}
+              value={newEmployee.role}
               onChange={(e) =>
-                setEmployeeData({ ...employeeData, role: e.target.value })
+                setNewEmployee({ ...newEmployee, role: e.target.value })
               }
             >
               <MenuItem value="Manager">Manager</MenuItem>
@@ -216,25 +209,29 @@ export default function EmployeeTable() {
             </Select>
           </FormControl>
           <TextField
-            fullWidth
             label="Telefon"
-            sx={{ mb: 2 }}
-            value={employeeData.phone}
+            fullWidth
+            value={newEmployee.phone}
             onChange={(e) =>
-              setEmployeeData({ ...employeeData, phone: e.target.value })
+              setNewEmployee({ ...newEmployee, phone: e.target.value })
             }
+            sx={{ mb: 2 }}
           />
           <TextField
-            fullWidth
             label="E-mail"
-            sx={{ mb: 2 }}
-            value={employeeData.email}
+            fullWidth
+            value={newEmployee.email}
             onChange={(e) =>
-              setEmployeeData({ ...employeeData, email: e.target.value })
+              setNewEmployee({ ...newEmployee, email: e.target.value })
             }
+            sx={{ mb: 2 }}
           />
           <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-            <Button variant="contained" color="success" onClick={handleAddEmployee}>
+            <Button
+              variant="contained"
+              color="success"
+              onClick={handleAddEmployee}
+            >
               Qo'shish
             </Button>
             <Button variant="outlined" color="error" onClick={handleCloseAddModal}>
@@ -259,25 +256,24 @@ export default function EmployeeTable() {
             borderRadius: 2,
           }}
         >
-          <Typography variant="h6" sx={{ mb: 2 }}>
-            Hodimni o'zgartirish
+          <Typography variant="h6" component="h2" sx={{ mb: 2 }}>
+            Xodimni o'zgartirish
           </Typography>
-          {/* Form is the same as Add */}
           <TextField
-            fullWidth
             label="F.I.O"
-            sx={{ mb: 2 }}
-            value={employeeData.name}
+            fullWidth
+            value={newEmployee.name}
             onChange={(e) =>
-              setEmployeeData({ ...employeeData, name: e.target.value })
+              setNewEmployee({ ...newEmployee, name: e.target.value })
             }
+            sx={{ mb: 2 }}
           />
           <FormControl fullWidth sx={{ mb: 2 }}>
             <InputLabel>Hodim turi</InputLabel>
             <Select
-              value={employeeData.role}
+              value={newEmployee.role}
               onChange={(e) =>
-                setEmployeeData({ ...employeeData, role: e.target.value })
+                setNewEmployee({ ...newEmployee, role: e.target.value })
               }
             >
               <MenuItem value="Manager">Manager</MenuItem>
@@ -285,25 +281,29 @@ export default function EmployeeTable() {
             </Select>
           </FormControl>
           <TextField
-            fullWidth
             label="Telefon"
-            sx={{ mb: 2 }}
-            value={employeeData.phone}
+            fullWidth
+            value={newEmployee.phone}
             onChange={(e) =>
-              setEmployeeData({ ...employeeData, phone: e.target.value })
+              setNewEmployee({ ...newEmployee, phone: e.target.value })
             }
+            sx={{ mb: 2 }}
           />
           <TextField
-            fullWidth
             label="E-mail"
-            sx={{ mb: 2 }}
-            value={employeeData.email}
+            fullWidth
+            value={newEmployee.email}
             onChange={(e) =>
-              setEmployeeData({ ...employeeData, email: e.target.value })
+              setNewEmployee({ ...newEmployee, email: e.target.value })
             }
+            sx={{ mb: 2 }}
           />
           <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-            <Button variant="contained" color="success" onClick={handleEditEmployee}>
+            <Button
+              variant="contained"
+              color="success"
+              onClick={handleEditEmployee}
+            >
               Saqlash
             </Button>
             <Button variant="outlined" color="error" onClick={handleCloseEditModal}>
@@ -329,14 +329,14 @@ export default function EmployeeTable() {
             textAlign: "center",
           }}
         >
-          <Typography variant="h6" sx={{ mb: 2 }}>
-            Ushbu xodimni o'chirishni xohlaysizmi?
+          <Typography variant="h6" component="h2" sx={{ mb: 2 }}>
+            O'chirasizmi?
           </Typography>
-          <Box sx={{ display: "flex", justifyContent: "space-around" }}>
+          <Box sx={{ display: "flex", justifyContent: "space-around", mt: 2 }}>
             <Button variant="contained" color="error" onClick={handleDeleteEmployee}>
               Ha
             </Button>
-            <Button variant="outlined" onClick={handleCloseDeleteModal}>
+            <Button variant="outlined" color="primary" onClick={handleCloseDeleteModal}>
               Yo'q
             </Button>
           </Box>
