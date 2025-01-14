@@ -11,32 +11,68 @@ import {
   Box,
   Paper,
   TablePagination,
+  Modal,
+  Typography,
+  CircularProgress,
 } from "@mui/material";
-import { useGetEmployeesQuery, useGetManagersQuery } from "@/lib/service/api";
+import { useRouter } from "next/navigation";
+import {
+  useGetEmployeesQuery,
+  useGetManagersQuery,
+  useDeleteManagerMutation,
+  useDeleteEmployesMutation,
+} from "@/lib/service/api";
 
 export default function HomePage() {
+  const router = useRouter();
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
+  const [searchQuery, setSearchQuery] = useState("");
 
-  const { data: employeesData, isLoading: isEmployeesLoading } =
-    useGetEmployeesQuery({
-      limit: pageSize,
-      page: currentPage,
-    });
+  const [openDeleteModal, setOpenDeleteModal] = useState(false);
+  const [selectedEmployee, setSelectedEmployee] = useState(null);
 
-  const { data: managersData, isLoading: isManagersLoading } =
-    useGetManagersQuery({
-      limit: pageSize,
-      page: currentPage,
-    });
+  const [loading, setLoading] = useState(false);
+  const {
+    data: employeesData,
+    error: employeesError,
+    isLoading: isEmployeesLoading,
+  } = useGetEmployeesQuery({
+    limit: pageSize,
+    page: currentPage,
+  });
+
+  const {
+    data: managersData,
+    error: managersError,
+    isLoading: isManagersLoading,
+  } = useGetManagersQuery({
+    limit: pageSize,
+    page: currentPage,
+  });
+
+  const [deleteManager] = useDeleteManagerMutation();
+  const [deleteEmloyes] = useDeleteEmployesMutation();
 
   const [employees, setEmployees] = useState([]);
 
   useEffect(() => {
-    if (employeesData && managersData) {
-      setEmployees([...employeesData, ...managersData]);
+    if (employeesError?.status === 401 || managersError?.status === 401) {
+      router.push("/login");
     }
-  }, [employeesData, managersData]);
+  }, [employeesError, managersError, router]);
+
+  useEffect(() => {
+    if (employeesData && managersData) {
+      const combined = [...employeesData, ...managersData];
+      const filtered = combined.filter(
+        (employee) =>
+          employee.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          employee.last_name?.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+      setEmployees(filtered);
+    }
+  }, [employeesData, managersData, searchQuery]);
 
   const handlePageChange = (event, newPage) => {
     setCurrentPage(newPage + 1);
@@ -45,6 +81,34 @@ export default function HomePage() {
   const handleRowsPerPageChange = (event) => {
     setPageSize(parseInt(event.target.value, 10));
     setCurrentPage(1);
+  };
+
+  const handleDeleteEmployee = async () => {
+    if (!selectedEmployee?.id) return;
+
+    setLoading(true);
+
+    try {
+      const a = await deleteEmloyes(selectedEmployee.id);
+      console.log(a);
+
+      console.log(
+        `Employee with ID: ${selectedEmployee.id} deleted from managers.`
+      );
+    } catch (error) {
+      if (error.response?.status === 404) {
+        try {
+          await deleteManager(selectedEmployee.id);
+        } catch (err) {
+          console.error("Failed to delete employee from employees:", err);
+        }
+      } else {
+        console.error("Failed to delete employee from managers:", error);
+      }
+    } finally {
+      setLoading(false);
+      setOpenDeleteModal(false);
+    }
   };
 
   const renderStatus = (isActive) => {
@@ -80,8 +144,12 @@ export default function HomePage() {
     );
   };
 
-  if (isEmployeesLoading || isManagersLoading) {
-    return <div>Yuklanmoqda...</div>;
+  if (isEmployeesLoading || isManagersLoading || loading) {
+    return (
+      <Box sx={{ display: "flex", justifyContent: "center", mt: 5 }}>
+        <CircularProgress />
+      </Box>
+    );
   }
 
   return (
@@ -94,13 +162,12 @@ export default function HomePage() {
           mb: 2,
         }}
       >
-        <Button variant="contained" color="success">
-          + Xodim qo'shish
-        </Button>
         <TextField
           variant="outlined"
-          placeholder="Поиск по фамилии"
+          placeholder="Search by name"
           size="small"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
           sx={{ width: "300px" }}
         />
       </Box>
@@ -109,18 +176,19 @@ export default function HomePage() {
         <Table>
           <TableHead>
             <TableRow sx={{ backgroundColor: "#f5f5f5" }}>
-              <TableCell sx={{ fontWeight: "bold" }}>Фамилия Имя</TableCell>
-              <TableCell sx={{ fontWeight: "bold" }}>Turi</TableCell>
-              <TableCell sx={{ fontWeight: "bold" }}>Телефон</TableCell>
+              <TableCell sx={{ fontWeight: "bold" }}>Name</TableCell>
+              <TableCell sx={{ fontWeight: "bold" }}>Type</TableCell>
+              <TableCell sx={{ fontWeight: "bold" }}>Phone</TableCell>
               <TableCell sx={{ fontWeight: "bold" }}>E-mail</TableCell>
-              <TableCell sx={{ fontWeight: "bold" }}>
-                Статус проверяющего
-              </TableCell>
+              <TableCell sx={{ fontWeight: "bold" }}>Status</TableCell>
+              <TableCell sx={{ fontWeight: "bold" }}>Actions</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {employees.map((employee, index) => (
-              <TableRow key={index}>
+            {employees.map((employee) => (
+              <TableRow
+                key={employee.id || `${employee.name}-${employee.tel_number}`}
+              >
                 <TableCell>
                   {employee.name} {employee.last_name}
                 </TableCell>
@@ -128,6 +196,18 @@ export default function HomePage() {
                 <TableCell>{employee.tel_number}</TableCell>
                 <TableCell>{employee.email}</TableCell>
                 <TableCell>{renderStatus(employee.isActive)}</TableCell>
+                <TableCell>
+                  <Button
+                    variant="contained"
+                    color="error"
+                    size="small"
+                    onClick={() =>
+                      setSelectedEmployee(employee) || setOpenDeleteModal(true)
+                    }
+                  >
+                    Delete
+                  </Button>
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>
@@ -136,12 +216,48 @@ export default function HomePage() {
 
       <TablePagination
         component="div"
-        count={100}
+        count={employeesData?.length + managersData?.length || 0}
         page={currentPage - 1}
         onPageChange={handlePageChange}
         rowsPerPage={pageSize}
         onRowsPerPageChange={handleRowsPerPageChange}
       />
+
+      <Modal open={openDeleteModal} onClose={() => setOpenDeleteModal(false)}>
+        <Box
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: 400,
+            bgcolor: "background.paper",
+            boxShadow: 24,
+            p: 4,
+            borderRadius: 2,
+          }}
+        >
+          <Typography variant="h6" component="h2" sx={{ mb: 2 }}>
+            Confirm deletion of this employee?
+          </Typography>
+          <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+            <Button
+              variant="contained"
+              color="error"
+              onClick={handleDeleteEmployee}
+            >
+              Delete
+            </Button>
+            <Button
+              variant="outlined"
+              color="success"
+              onClick={() => setOpenDeleteModal(false)}
+            >
+              Cancel
+            </Button>
+          </Box>
+        </Box>
+      </Modal>
     </Box>
   );
 }

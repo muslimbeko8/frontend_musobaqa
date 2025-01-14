@@ -75,6 +75,12 @@ const api = createApi({
         method: "DELETE",
       }),
     }),
+    deleteEmployes: builder.mutation({
+      query: (id) => ({
+        url: `/employees/${id}`,
+        method: "DELETE",
+      }),
+    }),
 
     // Edit manager details
     editManager: builder.mutation({
@@ -98,6 +104,9 @@ export const {
   useSearchManagerQuery,
   useDeleteManagerMutation,
   useEditManagerMutation,
+  useDeleteEmployesMutation
 } = api;
+
+
 
 export default api;
